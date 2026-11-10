@@ -261,6 +261,20 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 .seller-info { flex: 1; min-width: 0; }
 .seller-info b { display: block; }
 .seller-info span { color: var(--fg-3); font-size: 13px; }
+.temp { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px; font-size: 12px; }
+.temp b { font-size: 16px; }
+.temp i { display: block; width: 64px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, var(--c) var(--w), var(--line) var(--w)); }
+.temp.cool { --c: #3b82c4; color: #2a6aa8; } .temp.warm { --c: #e2ac3f; color: #a8740f; } .temp.hot { --c: #e0602b; color: #c24e1d; }
+.temp-wrap { text-align: right; font-size: 11.5px; color: var(--fg-3); }
+.stars { color: #e2ac3f; letter-spacing: 1px; }
+.rate-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.rate-row button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 2px; font: inherit; font-size: 12px; color: var(--fg-2); cursor: pointer; }
+.rate-row button b { display: block; font-size: 12px; letter-spacing: -1px; color: #e2ac3f; white-space: nowrap; }
+.rate-row button.on { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+.plan-row .dday { flex: none; font-weight: 700; font-size: 12.5px; padding: 3px 8px; border-radius: 6px; background: var(--brand-soft); color: var(--brand); }
+.plan-row .dday.today { background: #fde8df; color: #c24e1d; }
+.plan-row.past { opacity: .55; }
+.talent-note { font-size: 12.5px; color: var(--fg-2); background: var(--gold-soft); border-radius: 8px; padding: 8px 10px; }
 .review-count { text-align: right; font-size: 12.5px; color: var(--fg-3); }
 .review-count b { display: block; color: var(--gold-ink); font-size: 18px; background: var(--gold-soft); border-radius: 8px; padding: 0 8px; }
 .detail-body { padding: 20px 16px 8px; }
@@ -489,7 +503,15 @@ const ss = {
   get(k, d) { try { const v = sessionStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch {} }
 };
-const won = n => Number(n).toLocaleString('ko-KR') + '원';
+/* 10만원 미만은 15,000원, 10만원부터는 11만원 / 11만 5천원처럼 만 원 단위로 */
+const won = n => {
+  n = Math.round(Number(n) || 0);
+  if (n < 100000) return n.toLocaleString('ko-KR') + '원';
+  const m = Math.floor(n / 10000), r = n % 10000;
+  if (!r) return `${m}만원`;
+  if (r % 1000 === 0) return `${m}만 ${r / 1000}천원`;
+  return `${m}만 ${r.toLocaleString('ko-KR')}원`;
+};
 const priceLabel = p => Number(p) === 0 ? '나눔' : won(p);
 function ago(t) {
   const s = Math.max(0, (now() - t) / 1000);
@@ -522,7 +544,7 @@ function josa(word, withB, withoutB) {
   return word + (b ? withB : withoutB);
 }
 const gradeOf = sid => /^\d{4,6}$/.test(sid || '') ? sid[0] + '학년' : '';
-const MAX_PRICE = 30000;          /* 학생끼리 거래 — 가격 상한 */
+const MAX_PRICE = 1000000;         /* 학생끼리 거래 — 가격 상한 */
 const MAX_DEAL_DAYS = 30;         /* 거래 약속은 오늘부터 30일 안 */
 /* 직거래 장소 — 학교 건물 배치도(school-map.jpg) 위 위치(x, y %)와 사진.
    사진은 학교 홈페이지(donghwa.hs.kr) 사진을 먼저 쓰고, 안 열리면 배치도에서 잘라 둔 사진(places/)을 씀 */
@@ -543,7 +565,8 @@ const PLACES = [
 const placeImg = p => `<img src="${SCHOOL_SITE}${p.img}" alt="" loading="lazy" onerror="this.onerror=null;this.src='places/${p.alt}.jpg'">`;
 const HERO_PLACES = ['송학관', '비전관', '두나미스관', '어울림동', '여호수아홀'];
 const findPlace = name => PLACES.find(p => p.name === name || (name || '').startsWith(p.name));
-const CATS = ['교재·문제집', '도서', '필기구·학용품', '전자기기', '의류·체육복', '생활용품', '스포츠·취미', '기타'];
+const CATS = ['교재·문제집', '도서', '필기구·학용품', '전자기기', '의류·체육복', '생활용품', '스포츠·취미', '재능·서비스', '기타'];
+const TALENT = '재능·서비스'; /* 그림, 디자인, 레슨처럼 물건이 아닌 거래 */
 const AV_COLORS = ['#1d2089', '#3b4bc8', '#b0812a', '#2f6f8f', '#6b3fa0', '#8a3b52', '#2d7a5a'];
 function hashN(s, n) { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h % n; }
 function avatar(name, uid, cls = '') {
@@ -686,6 +709,19 @@ const myRooms = () => S.rooms.filter(r => r.sellerUid === me.uid || r.buyerUid =
 const isUnread = r => r.lastFrom && r.lastFrom !== me.uid && (r.updatedAt || 0) > Math.max(readMap()[r.id] || 0, r['read_' + me.uid] || 0);
 const roomIdFor = (itemId, buyerUid) => `${itemId}__${buyerUid}`;
 const reviewsFor = uid => S.reviews.filter(r => r.toUid === uid).sort((a, b) => b.at - a.at);
+/* 매너 온도: 36.5도에서 시작해 받은 평점에 따라 오르내린다 (평점이 없는 예전 후기는 4점으로 본다) */
+const RATE_STEP = { 5: 0.6, 4: 0.3, 3: 0, 2: -0.4, 1: -0.8 };
+const RATE_LABEL = { 5: '최고예요', 4: '좋아요', 3: '보통이에요', 2: '아쉬워요', 1: '별로예요' };
+function mannerTemp(uid) {
+  const t = reviewsFor(uid).reduce((sum, r) => sum + (RATE_STEP[r.rating || 4] || 0), 36.5);
+  return Math.max(0, Math.min(99, Math.round(t * 10) / 10));
+}
+function tempBadge(uid) {
+  const t = mannerTemp(uid);
+  const cls = t >= 40 ? 'hot' : t >= 36.5 ? 'warm' : 'cool';
+  return `<span class="temp ${cls}" title="매너 온도"><b>${t.toFixed(1)}°C</b><i style="--w:${Math.min(100, t)}%"></i></span>`;
+}
+const stars = n => n ? `<span class="stars" aria-label="평점 ${n}점">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</span> ` : '';
 
 /* =====================================================================
    알림 — 브라우저 알림(허용한 경우) + 화면 안 알림
@@ -827,7 +863,9 @@ function topbar() {
    화면들
    ===================================================================== */
 const photoCache = {}, photoLoading = {};
-const homeState = { q: '', filter: 'all', cat: 'all' };
+const homeState = { q: '', filter: 'all', cat: 'all', price: 'all' };
+/* 가격대 필터 (원 단위, 이상~이하) */
+const PRICE_BANDS = [['all', '전체 가격', 0, Infinity], ['u1', '1만원 이하', 0, 10000], ['u5', '1~5만원', 10001, 50000], ['u10', '5~10만원', 50001, 100000], ['o10', '10만원 넘게', 100001, Infinity]];
 function itemRow(i) {
   const chats = S.rooms.filter(r => r.itemId === i.id).length;
   const wish = (i.wishers || []).length;
@@ -860,6 +898,8 @@ const VIEWS = {
     if (homeState.cat !== 'all') items = items.filter(i => (i.category || '기타') === homeState.cat);
     if (homeState.filter === 'free') items = items.filter(i => Number(i.price) === 0);
     if (homeState.filter === 'selling') items = items.filter(i => i.status === 'selling');
+    const band = PRICE_BANDS.find(b => b[0] === homeState.price) || PRICE_BANDS[0];
+    if (band[0] !== 'all') items = items.filter(i => Number(i.price) >= band[2] && Number(i.price) <= band[3]);
     const showAlertTip = !prefs().newItemAlert && !ls.get('dh_tip_closed', false);
     const f = homeState.filter, bt = homeState.board || 'new';
     const recent = [...S.items].filter(i => !isHidden(i)).sort((a, b) => b.createdAt - a.createdAt);
@@ -878,7 +918,7 @@ const VIEWS = {
     <section class="hero" aria-label="동화IN 소개">
       ${HERO_PLACES.map((n, k) => `<div class="slide" style="${slide(n)};animation-delay:${k * 5}s"><span class="slide-cap">${pl(n).mark} ${n}</span></div>`).join('')}
       <div class="hero-bar" aria-hidden="true">${HERO_PLACES.map((n, k) => `<i style="--d:${k * 5}s"></i>`).join('')}</div>
-      <div class="hero-text"><small>DONGHWA IN</small><h2>동화인끼리, <em>믿고</em> 거래하는<br>우리 학교 장터</h2><p>교재부터 체육복까지, 학교 안에서 직접 만나 거래해요.</p></div>
+      <div class="hero-text"><small>DONGHWA IN</small><h2>동화인끼리, <em>믿고</em> 거래하는<br>우리 학교 장터</h2><p>교재부터 체육복, 재능까지. 학교 안에서 직접 만나 거래해요.</p></div>
     </section>
     ${showAlertTip ? `<div class="notice-strip" style="margin:12px 16px 0">${I.bell.replace('<svg', '<svg width="18" height="18" style="flex:none"')}<span>알림을 켜면 새 물건이 올라올 때 바로 알려 드려요.</span><button data-act="bell">켜기</button></div>` : ''}
     <section class="sec" id="gal" style="scroll-margin-top:100px">
@@ -893,15 +933,18 @@ const VIEWS = {
           <button class="chip ${f === 'selling' ? 'on' : ''}" data-act="filter:${f === 'selling' ? 'all' : 'selling'}">판매중만</button>
           <button class="chip ${f === 'free' ? 'on' : ''}" data-act="filter:${f === 'free' ? 'all' : 'free'}">나눔만</button>
         </div>
+        <div class="chips sub" role="group" aria-label="가격대">
+          ${PRICE_BANDS.map(b => `<button class="chip ${homeState.price === b[0] ? 'on' : ''}" data-act="priceBand:${b[0]}">${b[1]}</button>`).join('')}
+        </div>
       </div>
       ${items.length ? `<ul class="gallery">${items.map(galCard).join('')}</ul>`
-        : `<div class="empty"><b>${q ? '찾는 물건이 없어요' : '아직 올라온 물건이 없어요'}</b>${q ? '다른 이름으로 검색해 보세요.' : '오른쪽 아래 ‘물건 올리기’로 첫 물건을 올려 보세요.'}</div>`}
+        : `<div class="empty"><b>${q || band[0] !== 'all' ? '조건에 맞는 물건이 없어요' : '아직 올라온 물건이 없어요'}</b>${q || band[0] !== 'all' ? '검색어나 가격대를 바꿔 보세요.' : '오른쪽 아래 ‘물건 올리기’로 첫 물건을 올려 보세요.'}</div>`}
     </section>
     <footer class="site-foot">
       <div class="fl"><img src="logo.png" alt=""><b>동화<span>IN</span></b></div>
       <nav><button data-act="suggestions">건의하기</button><button data-act="mapShow:">학교 지도</button><a href="https://donghwa.hs.kr/" target="_blank" rel="noopener">동화고 홈페이지</a></nav>
       <p>동화IN은 동화고등학교 학생들이 학교 안에서 안전하게 물건을 사고팔고 나누도록 만든 학생 프로젝트예요.</p>
-      <p>가격 상한 30,000원 · 거래는 교내 직거래로만</p>
+      <p>가격 상한 ${won(MAX_PRICE)} · 거래는 교내 직거래로만</p>
       <p style="margin-top:8px">© 2026 Donghwa IN. All rights reserved.</p>
     </footer>
     ${tabbar('home')}`;
@@ -953,7 +996,7 @@ const VIEWS = {
     <div class="seller">
       ${avatar(i.sellerName, i.sellerUid)}
       <div class="seller-info"><b>${esc(i.sellerName)}</b><span>${esc(gradeOf(i.sellerSid))} · 학번 ${esc(i.sellerSid)}</span></div>
-      <div class="review-count"><b>${rv.length}</b>받은 후기</div>
+      <div class="temp-wrap">${tempBadge(i.sellerUid)}<div>매너 온도 · 후기 ${rv.length}</div></div>
     </div>
     ${banner}
     <div class="detail-body">
@@ -964,12 +1007,12 @@ const VIEWS = {
       <dl class="facts">
         <div><dt>직거래 장소</dt><dd>${esc(i.place || '채팅으로 정해요')} ${i.place ? `<button class="map-link" data-act="mapShow:${esc(i.place)}">지도 보기</button>` : ''}</dd></div>
         ${findPlace(i.place) ? `<div class="place-card" data-act="mapShow:${esc(i.place)}" style="cursor:pointer">${placeImg(findPlace(i.place))}<div><b>${findPlace(i.place).mark} ${esc(findPlace(i.place).name)}</b><span>${esc(findPlace(i.place).desc)}</span></div></div>` : ''}
-        <div><dt>거래 방식</dt><dd>${Number(i.price) === 0 ? '무료 나눔' : '직거래 · 현장 결제'}</dd></div>
+        <div><dt>거래 방식</dt><dd>${i.category === TALENT ? (Number(i.price) === 0 ? '재능 나눔' : '재능 거래 · 만나서 결과물 전달 후 결제') : Number(i.price) === 0 ? '무료 나눔' : '직거래 · 현장 결제'}</dd></div>
       </dl>
     </div>
     <section class="reviews">
       <h3>${esc(i.sellerName)}님이 받은 후기 ${rv.length}</h3>
-      ${rv.length ? rv.slice(0, 3).map(r => `<div class="review">${esc(r.text)}<span>${esc(r.fromName)} · ${esc(r.itemTitle)} · ${ago(r.at)}</span></div>`).join('') : '<div class="review" style="color:var(--fg-3)">아직 받은 후기가 없어요.</div>'}
+      ${rv.length ? rv.slice(0, 3).map(r => `<div class="review">${stars(r.rating)}${esc(r.text)}<span>${esc(r.fromName)} · ${esc(r.itemTitle)} · ${ago(r.at)}</span></div>`).join('') : '<div class="review" style="color:var(--fg-3)">아직 받은 후기가 없어요.</div>'}
     </section>
     <div class="action-bar">
       <button class="heart ${wished ? 'on' : ''}" data-act="wish:${i.id}" ${mine || i.status === 'done' ? 'disabled' : ''} aria-pressed="${wished}" aria-label="찜하기">${I.heart}${wishers.length}</button>
@@ -994,6 +1037,7 @@ const VIEWS = {
       <div class="field">
         <div class="label" id="cat-label">카테고리</div>
         <div class="chips wrap" role="radiogroup" aria-labelledby="cat-label">${CATS.map(c => `<button type="button" class="chip" role="radio" aria-checked="false" data-act="pickCat:${c}">${c}</button>`).join('')}</div>
+        <div class="talent-note" id="talentNote" hidden><b>재능·서비스</b>는 물건이 아닌 재능을 거래해요. 예) 그림·캐리커처, 포스터·PPT 디자인 도움, 악기·운동 레슨, 사진 촬영<br>단, <b>수행평가나 과제를 대신 해 주는 거래는 부정행위라 올릴 수 없어요.</b></div>
       </div>
       <div class="field">
         <label for="f-desc">자세한 설명</label>
@@ -1061,6 +1105,11 @@ const VIEWS = {
     <div class="form">
       <div class="room-item" style="padding:0;border:0"><div class="mini">${cover(i)}</div><div class="t"><b>${esc(i.title)}</b>${esc(i.sellerName)}님과 거래했어요</div></div>
       <div class="field">
+        <div class="label" style="font-weight:700">${esc(i.sellerName)}님과의 거래는 어땠나요?</div>
+        <div class="rate-row" role="radiogroup" aria-label="평점">${[5, 4, 3, 2, 1].map(n => `<button type="button" role="radio" aria-checked="false" data-act="rate:${n}"><b>${'★'.repeat(n)}</b>${RATE_LABEL[n]}</button>`).join('')}</div>
+        <small>평점은 상대의 매너 온도에 반영돼요. 처음 온도는 36.5°C예요.</small>
+      </div>
+      <div class="field">
         <div class="ai-head"><span class="label" style="font-weight:700">추천 멘트</span><span class="ai-tag" id="aiTag">AI 추천</span>
           <button class="btn ghost sm" style="margin-left:auto" data-act="regen:${i.id}">다시 추천</button></div>
         <small id="aiNote">고르면 아래 칸에 들어가요. 고른 뒤 고쳐 써도 돼요.</small>
@@ -1082,6 +1131,9 @@ const VIEWS = {
     const rv = reviewsFor(me.uid);
     const myDeals = S.deals.filter(d => d.sellerUid === me.uid || d.buyerUid === me.uid).sort((a, b) => b.at - a.at);
     const toWrite = S.items.filter(i => i.status === 'done' && i.buyerUid === me.uid && !S.reviews.some(r => r.itemId === i.id && r.fromUid === me.uid));
+    const planned = myRooms().filter(r => r.dealAt);
+    const planUp = planned.filter(r => r.dealAt >= now() - 3600e3).sort((a, b) => a.dealAt - b.dealAt);
+    const planPast = planned.filter(r => r.dealAt < now() - 3600e3).sort((a, b) => b.dealAt - a.dealAt);
     let body = '';
     if (tab === 'sell') body = mineItems.length ? `<ul class="list">${mineItems.map(itemRow).join('')}</ul>` : `<div class="empty">올린 물건이 없어요.</div>`;
     if (tab === 'wish') body = wishItems.length ? `<ul class="list">${wishItems.map(itemRow).join('')}</ul>` : `<div class="empty">찜한 물건이 없어요.</div>`;
@@ -1096,14 +1148,29 @@ const VIEWS = {
         <div class="amt">${esc(priceLabel(d.price))}<small>${dt.getFullYear()}.${dt.getMonth() + 1}.${dt.getDate()}</small></div>
       </div>`;
     }).join('') : `<div class="empty">아직 끝난 거래가 없어요.<br>채팅방에서 판매자가 ‘거래완료’를 누르면 여기에 남아요.</div>`;
-    if (tab === 'review') body = `<div class="reviews">${rv.length ? rv.map(r => `<div class="review">${esc(r.text)}<span>${esc(r.fromName)} · ${esc(r.itemTitle)} · ${ago(r.at)}</span></div>`).join('') : '<div class="empty">아직 받은 후기가 없어요.</div>'}</div>`;
+    if (tab === 'plan') {
+      const day0 = new Date(); day0.setHours(0, 0, 0, 0);
+      const dday = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); const n = Math.round((d - day0) / 864e5); return n === 0 ? '오늘' : n > 0 ? `D-${n}` : '지남'; };
+      const row = r => {
+        const sell = r.sellerUid === me.uid, item = itemById(r.itemId) || { id: r.itemId, title: r.itemTitle };
+        const dd = dday(r.dealAt), past = r.dealAt < now() - 3600e3;
+        return `<div class="chat-row plan-row ${past ? 'past' : ''}" data-act="chat:${r.id}">
+          <div class="mini">${cover(item)}</div>
+          <div class="mid"><div class="name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(item.title)}</div>
+            <div class="last">${dealLabel(r.dealAt)} · ${esc(item.place || '장소 미정')}<br>${sell ? `${esc(r.buyerName)}님에게 판매` : `${esc(r.sellerName)}님에게서 구매`}</div></div>
+          <span class="dday ${dd === '오늘' ? 'today' : ''}">${dd}</span></div>`;
+      };
+      body = planUp.length || planPast.length ? planUp.map(row).join('') + (planPast.length ? `<div class="sec-label" style="padding:14px 16px 4px;color:var(--fg-3);font-size:13px">지난 약속</div>` + planPast.slice(0, 5).map(row).join('') : '')
+        : `<div class="empty">잡힌 거래 일정이 없어요.<br>채팅방에서 ‘거래 날짜’를 정하면 여기에 모여요.</div>`;
+    }
+    if (tab === 'review') body = `<div class="reviews">${rv.length ? rv.map(r => `<div class="review">${stars(r.rating)}${esc(r.text)}<span>${esc(r.fromName)} · ${esc(r.itemTitle)} · ${ago(r.at)}</span></div>`).join('') : '<div class="empty">아직 받은 후기가 없어요.</div>'}</div>`;
     if (tab === 'todo') body = toWrite.length ? toWrite.map(i => `<div class="chat-row" data-act="review:${i.id}"><div class="mini">${cover(i)}</div><div class="mid"><div class="name">${esc(i.title)}</div><div class="last">${esc(i.sellerName)}님과의 거래 후기를 남겨 주세요</div></div><span class="btn primary sm">쓰기</span></div>`).join('') : `<div class="empty">남길 후기가 없어요.</div>`;
     const p = prefs();
     const perm = 'Notification' in window ? Notification.permission : 'unsupported';
     return `<header class="topbar"><div class="brand"><b>내 정보</b></div></header>
     <div class="me-card">
       ${avatar(me.name || '나', me.uid)}
-      <div>${hasProfile() ? `<b>${esc(me.name)}</b><span>${esc(gradeOf(me.sid))} · 학번 ${esc(me.sid)}</span>` : `<b>프로필을 등록해 주세요</b><span>학번과 이름이 있어야 거래할 수 있어요</span>`}</div>
+      <div>${hasProfile() ? `<b>${esc(me.name)}</b><span>${esc(gradeOf(me.sid))} · 학번 ${esc(me.sid)}</span><div style="margin-top:6px">${tempBadge(me.uid)} <small style="color:var(--fg-3)">내 매너 온도</small></div>` : `<b>프로필을 등록해 주세요</b><span>학번과 이름이 있어야 거래할 수 있어요</span>`}</div>
       <button class="btn ghost sm" data-act="editProfile">${hasProfile() ? '수정' : '등록'}</button>
     </div>
     <div class="setting">
@@ -1115,6 +1182,7 @@ const VIEWS = {
     <div class="seg">
       <button class="chip ${tab === 'sell' ? 'on' : ''}" data-act="meTab:sell">판매 내역 ${mineItems.length}</button>
       <button class="chip ${tab === 'wish' ? 'on' : ''}" data-act="meTab:wish">찜 ${wishItems.length}</button>
+      <button class="chip ${tab === 'plan' ? 'on' : ''}" data-act="meTab:plan">거래 일정 ${planUp.length}</button>
       <button class="chip ${tab === 'deals' ? 'on' : ''}" data-act="meTab:deals">거래 기록 ${myDeals.length}</button>
       <button class="chip ${tab === 'todo' ? 'on' : ''}" data-act="meTab:todo">쓸 후기 ${toWrite.length}</button>
       <button class="chip ${tab === 'review' ? 'on' : ''}" data-act="meTab:review">받은 후기 ${rv.length}</button>
@@ -1130,6 +1198,7 @@ const VIEWS = {
   }
 };
 const meState = { tab: 'sell' };
+let reviewRate = 0;
 VIEWS.suggestions = () => {
   const admin = isAdmin();
   const tab = admin ? (sugState.tab === 'reports' ? 'reports' : 'all') : sugState.tab;
@@ -1212,7 +1281,7 @@ function setupPrice() {
     if (over) digits = String(MAX_PRICE);
     inp.value = digits ? Number(digits).toLocaleString('ko-KR') : '';
     const hint = $('#price-hint');
-    hint.textContent = over ? `가격은 최대 ${won(MAX_PRICE)}까지 올릴 수 있어요.` : `최대 ${won(MAX_PRICE)} · 0원을 입력하면 자동으로 나눔으로 바뀌어요.`;
+    hint.textContent = over ? `가격은 최대 ${won(MAX_PRICE)}까지 올릴 수 있어요.` : digits && Number(digits) > 0 ? `${won(digits)}으로 올려요 · 최대 ${won(MAX_PRICE)}` : `최대 ${won(MAX_PRICE)} · 0원을 입력하면 자동으로 나눔으로 바뀌어요.`;
     hint.classList.toggle('err', !!over);
     if (digits === '0') setPriceMode('free');
   });
@@ -1528,7 +1597,7 @@ const ACT = {
   back() { back(); },
   open(id) { go('detail', { id }); },
   chat(id) { go('chat', { id }); },
-  review(id) { go('review', { id }); },
+  review(id) { reviewRate = 0; go('review', { id }); },
   filter(f) { homeState.filter = f; render(); },
   cat(c) { homeState.cat = c; render(); },
   catGo(c) { homeState.cat = c; go('home'); },
@@ -1536,6 +1605,8 @@ const ACT = {
   galGo(f) { homeState.filter = f; if (f !== 'free') { homeState.cat = 'all'; } if (current().name !== 'home') go('home'); else render(); requestAnimationFrame(() => { const g = document.getElementById('gal'); g && g.scrollIntoView({ behavior: 'smooth' }); }); },
   pickCat(c, btn) {
     newFormState.cat = c;
+    const tn = $('#talentNote'); if (tn) tn.hidden = c !== TALENT;
+    const ti = $('#f-title'); if (ti) ti.placeholder = c === TALENT ? '예) 캐리커처 그려 드려요 / 기타 레슨 1회' : '예) 수능특강 수학Ⅰ / 공학용 계산기 / 체육복 상의 L';
     btn.parentElement.querySelectorAll('.chip').forEach(b => { const on = b === btn; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
   },
   meTab(t) { meState.tab = t; render(); },
@@ -1684,10 +1755,16 @@ const ACT = {
     $('#rv-text').value = btn.textContent; $('#rv-text').focus();
   },
   regen(id) { loadSuggestions(id, true); },
+  rate(n, btn) {
+    reviewRate = Number(n);
+    btn.parentElement.querySelectorAll('button').forEach(b => { const on = b === btn; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  },
+  priceBand(p) { homeState.price = p; render(); },
   async submitReview(itemId) {
     const i = itemById(itemId); const text = $('#rv-text').value.trim();
+    if (!reviewRate) { const e = $('#rvErr'); e.textContent = '평점을 골라 주세요.'; e.hidden = false; return; }
     if (text.length < 5) { const e = $('#rvErr'); e.textContent = '후기를 5자 이상 써 주세요.'; e.hidden = false; return; }
-    await store.add('reviews', { itemId, itemTitle: i.title, fromUid: me.uid, fromName: me.name, toUid: i.sellerUid, text, at: now() });
+    await store.add('reviews', { itemId, itemTitle: i.title, fromUid: me.uid, fromName: me.name, toUid: i.sellerUid, text, rating: reviewRate, at: now() });
     toast('후기를 보냈어요', `${i.sellerName}님에게 전해졌어요.`); back();
   },
   async editProfile() { await profileSheet(); },
