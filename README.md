@@ -58,3 +58,5 @@
 - 게시물 신고 (서로 다른 3명이 신고하면 자동으로 숨김) → Firestore `reports` 컬렉션
 - 관리자에게 건의하기 → Firestore `suggestions` 컬렉션
 - 관리자 확인 방법: Firebase 콘솔 › Firestore Database › 데이터 탭에서 `reports`, `suggestions`를 열어 보기
+
+주소: https://donghwa-in.github.io/
