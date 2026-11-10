@@ -10,7 +10,7 @@
 <title>동화IN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
 /* Layout: 모바일 앱 한 열(최대 480px), 위 고정 헤더 + 아래 탭바 + 오른쪽 아래 등록 버튼 */
 :root {
@@ -33,8 +33,8 @@
   --ok: #1f7a4d;
   --ok-soft: #e3f3ea;
   --shadow: 0 8px 28px rgba(22, 23, 60, .14);
-  --font-body: "IBM Plex Sans KR", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
-  --font-display: "Gowun Batang", "Nanum Myeongjo", "AppleMyungjo", serif;
+  --font-body: "Noto Sans KR", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --font-display: "Noto Sans KR", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -71,8 +71,11 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 /* ---------- 헤더 ---------- */
 .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 12px 0 16px; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: 8px; margin-right: auto; }
-.brand img { width: 30px; height: 30px; border-radius: 50%; }
-.brand b { font-family: var(--font-display); font-size: 21px; letter-spacing: -.5px; color: var(--fg); }
+.brand img { width: 36px; height: 36px; border-radius: 50%; }
+.brand b { font-family: var(--font-display); font-weight: 900; font-size: 20px; letter-spacing: -.5px; color: var(--navy); line-height: 1.1; }
+.brand small { display: block; font-size: 10px; letter-spacing: .3px; color: var(--fg-3); font-weight: 500; }
+:root[data-theme="dark"] .brand b { color: var(--fg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brand b { color: var(--fg); } }
 .brand b span { color: var(--gold); font-family: var(--font-body); font-weight: 700; letter-spacing: .5px; margin-left: 2px; }
 .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; color: var(--fg-2); position: relative; }
 .icon-btn:hover { background: var(--surface-2); }
@@ -130,6 +133,78 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 .cover.big { font-size: 26px; padding: 28px 28px 32px 40px; }
 .cover.big::before { left: 18px; width: 5px; }
 .cover.big::after { width: 34px; height: 34px; right: 24px; top: 24px; }
+
+
+/* ---------- 학교 홈페이지 느낌: 메뉴 띠, 메인 비주얼, 퀵메뉴, 게시판, 갤러리, 푸터 ---------- */
+.home-top { position: sticky; top: 0; z-index: 20; }
+.home-top .topbar { position: static; height: 60px; }
+.gnb { display: flex; background: #1d2089; overflow-x: auto; scrollbar-width: none; }
+.gnb button { flex: 1 0 auto; height: 42px; padding: 0 12px; color: #fff; font-weight: 700; font-size: 14px; position: relative; }
+.gnb button.on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px; background: var(--gold); }
+.gnb button:active { background: rgba(255,255,255,.1); }
+.hero { position: relative; height: 230px; overflow: hidden; background: #1d2089; color: #fff; }
+.hero .slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; animation: heroFade 15s infinite; }
+.hero .slide:nth-child(2) { animation-delay: 5s; }
+.hero .slide:nth-child(3) { animation-delay: 10s; }
+.hero .slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,16,70,.15) 0%, rgba(14,16,70,.78) 100%); }
+@keyframes heroFade { 0% { opacity: 0; transform: scale(1.06); } 5% { opacity: 1; } 33% { opacity: 1; } 38% { opacity: 0; transform: scale(1); } 100% { opacity: 0; } }
+.hero-text { position: absolute; left: 20px; right: 20px; bottom: 22px; z-index: 2; }
+.hero-text small { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 6px; }
+.hero-text h2 { margin: 0; font-size: 24px; font-weight: 900; line-height: 1.3; letter-spacing: -.5px; word-break: keep-all; text-shadow: 0 2px 10px rgba(0,0,0,.3); }
+.hero-text h2 em { font-style: normal; color: var(--gold); }
+.hero-text p { margin: 6px 0 0; font-size: 13px; opacity: .9; }
+.hero-bar { position: absolute; left: 20px; top: 18px; z-index: 2; display: flex; gap: 6px; }
+.hero-bar i { width: 18px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.35); overflow: hidden; position: relative; }
+.hero-bar i::after { content: ""; position: absolute; inset: 0; background: #fff; transform: scaleX(0); transform-origin: left; animation: heroBar 15s infinite linear; }
+.hero-bar i:nth-child(2)::after { animation-delay: 5s; }
+.hero-bar i:nth-child(3)::after { animation-delay: 10s; }
+@keyframes heroBar { 0% { transform: scaleX(0); } 33.3% { transform: scaleX(1); } 33.4%, 100% { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .hero .slide, .hero-bar i::after { animation: none; } .hero .slide:first-child { opacity: 1; } }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 18px 12px 16px; margin-top: -1px; background: var(--surface); border-bottom: 8px solid var(--bg); }
+.quick button { display: grid; justify-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; color: var(--fg); }
+.quick .qi { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand); border: 2px solid transparent; }
+.quick button:nth-child(2) .qi { background: var(--gold-soft); color: var(--gold-ink); }
+.quick .qi svg { width: 26px; height: 26px; }
+.quick button:active .qi { border-color: var(--gold); }
+.sec { padding: 18px 16px 8px; border-bottom: 8px solid var(--bg); }
+.sec-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.sec-head h2 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: -.5px; position: relative; padding-left: 12px; }
+.sec-head h2::before { content: ""; position: absolute; left: 0; top: 4px; bottom: 4px; width: 4px; border-radius: 2px; background: var(--gold); }
+.sec-head .more { margin-left: auto; width: 26px; height: 26px; border: 1px solid var(--line); display: grid; place-items: center; font-size: 18px; line-height: 1; color: var(--fg-2); }
+.btabs { display: flex; border-bottom: 2px solid var(--fg); margin-bottom: 4px; }
+.btabs button { flex: 1; height: 40px; font-weight: 700; font-size: 14px; color: var(--fg-3); background: var(--surface-2); border: 1px solid var(--line); border-bottom: 0; }
+.btabs button + button { border-left: 0; }
+.btabs button.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+.board { list-style: none; margin: 0; padding: 0; }
+.board li { display: flex; align-items: center; gap: 8px; padding: 11px 2px; border-bottom: 1px dashed var(--line); cursor: pointer; font-size: 14px; }
+.board li::before { content: ""; width: 4px; height: 4px; background: var(--fg-3); flex: none; }
+.board .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board .t .pill { height: 18px; font-size: 10.5px; padding: 0 5px; margin-right: 5px; vertical-align: 1px; }
+.board .d { flex: none; color: var(--fg-3); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.board .new { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 3px; background: var(--danger); color: #fff; font-size: 9.5px; font-weight: 900; margin-left: 4px; vertical-align: 1px; }
+.board-empty { padding: 22px 0; text-align: center; color: var(--fg-3); font-size: 13.5px; }
+.gal-tools { display: grid; gap: 10px; margin-bottom: 12px; }
+.search { border-radius: 4px; border: 1px solid var(--line); background: var(--surface); }
+.gallery { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 10px; }
+.gcard { cursor: pointer; min-width: 0; }
+.gcard.faded { opacity: .55; }
+.gthumb { position: relative; aspect-ratio: 5 / 4; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); }
+.gthumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+.gcard:hover .gthumb img { transform: scale(1.04); }
+.gthumb .pill { position: absolute; left: 6px; top: 6px; }
+.gcard h3 { margin: 7px 0 0; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gcard .gp { font-weight: 900; font-size: 15px; }
+.gcard .gp .pill { vertical-align: 2px; }
+.gcard .gm { font-size: 11.5px; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.site-foot { background: #2b2c3a; color: #b7b8c6; padding: 22px 20px 26px; font-size: 12px; line-height: 1.7; }
+.site-foot .fl { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.site-foot .fl img { width: 34px; height: 34px; border-radius: 50%; filter: grayscale(.2); }
+.site-foot .fl b { color: #fff; font-size: 16px; font-weight: 900; }
+.site-foot .fl b span { color: var(--gold); }
+.site-foot nav { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 10px; }
+.site-foot nav button, .site-foot nav a { color: #fff; font-weight: 700; font-size: 12.5px; text-decoration: none; }
+.site-foot nav button:first-child { color: var(--gold); }
+.site-foot p { margin: 0; }
 
 /* ---------- 탭바 & FAB ---------- */
 .tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(480px, 100%); z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -498,6 +573,7 @@ const I = {
   send: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4l17.5-7.5a1 1 0 0 0 0-1.8L3.4 3.6a.9.9 0 0 0-1.3 1l1.6 6.4 9.3 1-9.3 1-1.6 6.4a.9.9 0 0 0 1.3 1z"/></svg>',
   cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>',
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>',
   search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
   flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
   pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>',
@@ -743,7 +819,7 @@ function tabbar(on) {
 function topbar() {
   const alert = prefs().newItemAlert;
   return `<header class="topbar">
-    <div class="brand"><img src="logo.png" alt=""><b>동화<span>IN</span></b></div>
+    <div class="brand"><img src="logo.png" alt=""><div><b>동화<span>IN</span></b><small>동화고등학교 학생 거래 마당</small></div></div>
     <button class="icon-btn small" id="refreshBtn" data-act="refresh" aria-label="새로고침" title="새로고침">${I.refresh}</button>
     <button class="icon-btn" data-act="bell" aria-label="새 물건 알림 ${alert ? '켜짐' : '꺼짐'}" title="새 물건 알림">${I.bell}${alert ? '<span class="dot"></span>' : ''}</button>
   </header>`;
@@ -768,31 +844,85 @@ function itemRow(i) {
     </div>
   </li>`;
 }
+function galCard(i) {
+  const pill = i.status === 'reserved' ? '<span class="pill reserved">예약중</span>' : i.status === 'done' ? '<span class="pill done">거래완료</span>' : '';
+  return `<li class="gcard ${i.status === 'done' ? 'faded' : ''}" data-act="open:${i.id}">
+    <div class="gthumb">${cover(i)}${pill}</div>
+    <h3>${esc(i.title)}</h3>
+    <div class="gp">${Number(i.price) === 0 ? '<span class="pill free">나눔</span>' : esc(won(i.price))}</div>
+    <div class="gm">${esc(i.place || '장소 미정')} · ${ago(i.createdAt)}</div>
+  </li>`;
+}
 const VIEWS = {
   home() {
     const q = homeState.q.trim().toLowerCase();
-    let items = [...S.items].filter(i => !isHidden(i)).sort((a, b) => (a.status === 'done') - (b.status === 'done') || b.createdAt - a.createdAt);
+    const visible = [...S.items].filter(i => !isHidden(i));
+    let items = visible.sort((a, b) => (a.status === 'done') - (b.status === 'done') || b.createdAt - a.createdAt);
     if (q) items = items.filter(i => (i.title + ' ' + (i.desc || '')).toLowerCase().includes(q));
     if (homeState.cat !== 'all') items = items.filter(i => (i.category || '기타') === homeState.cat);
     if (homeState.filter === 'free') items = items.filter(i => Number(i.price) === 0);
     if (homeState.filter === 'selling') items = items.filter(i => i.status === 'selling');
     const showAlertTip = !prefs().newItemAlert && !ls.get('dh_tip_closed', false);
-    const f = homeState.filter;
-    return `${topbar()}
-    <div class="home-tools">
-      <label class="search">${I.search}<input id="q" type="search" placeholder="물건 이름으로 찾기" value="${esc(homeState.q)}" data-bind="search"></label>
-      <div class="chips" role="group" aria-label="카테고리">
-        <button class="chip ${homeState.cat === 'all' ? 'on' : ''}" data-act="cat:all">전체</button>
-        ${CATS.map(c => `<button class="chip ${homeState.cat === c ? 'on' : ''}" data-act="cat:${c}">${c}</button>`).join('')}
-      </div>
-      <div class="chips sub" role="group" aria-label="거래 상태">
-        <button class="chip ${f === 'selling' ? 'on' : ''}" data-act="filter:${f === 'selling' ? 'all' : 'selling'}">판매중만</button>
-        <button class="chip ${f === 'free' ? 'on' : ''}" data-act="filter:${f === 'free' ? 'all' : 'free'}">나눔만</button>
-      </div>
+    const f = homeState.filter, bt = homeState.board || 'new';
+    const recent = [...S.items].filter(i => !isHidden(i)).sort((a, b) => b.createdAt - a.createdAt);
+    const boardItems = (bt === 'free' ? recent.filter(i => Number(i.price) === 0 && i.status !== 'done') : bt === 'reserved' ? recent.filter(i => i.status === 'reserved') : recent.filter(i => i.status !== 'done')).slice(0, 5);
+    const md = t => { const d = new Date(t); return `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`; };
+    const pl = n => findPlace(n) || PLACES[0];
+    const slide = n => { const p = pl(n); return `background-image:url('${SCHOOL_SITE}${p.img}'),url('places/${p.alt}.jpg')`; };
+    return `<div class="home-top">${topbar()}
+      <nav class="gnb" aria-label="주 메뉴">
+        <button class="${f !== 'free' ? 'on' : ''}" data-act="galGo:all">전체 물건</button>
+        <button class="${f === 'free' ? 'on' : ''}" data-act="galGo:free">나눔</button>
+        <button data-act="mapShow:">학교 지도</button>
+        <button data-act="suggestions">건의</button>
+        <button data-act="tab:me">내 정보</button>
+      </nav></div>
+    <section class="hero" aria-label="동화IN 소개">
+      <div class="slide" style="background-image:url('school-map.jpg')"></div>
+      <div class="slide" style="${slide('송학관')}"></div>
+      <div class="slide" style="${slide('어울림동')}"></div>
+      <div class="hero-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="hero-text"><small>DONGHWA IN</small><h2>동화인끼리, <em>믿고</em> 거래하는<br>우리 학교 장터</h2><p>교재부터 체육복까지, 학교 안에서 직접 만나 거래해요.</p></div>
+    </section>
+    <div class="quick">
+      <button data-act="newItem"><span class="qi">${I.plus}</span>물건 올리기</button>
+      <button data-act="galGo:free"><span class="qi">${I.gift}</span>나눔</button>
+      <button data-act="mapShow:"><span class="qi">${I.pin}</span>학교 지도</button>
+      <button data-act="suggestions"><span class="qi">${I.mail}</span>건의하기</button>
     </div>
-    ${showAlertTip ? `<div class="notice-strip">${I.bell.replace('<svg', '<svg width="18" height="18" style="flex:none"')}<span>알림을 켜면 새 물건이 올라올 때 바로 알려 드려요.</span><button data-act="bell">켜기</button></div>` : ''}
-    ${items.length ? `<ul class="list">${items.map(itemRow).join('')}</ul>`
-      : `<div class="empty"><b>${q ? '찾는 물건이 없어요' : '아직 올라온 물건이 없어요'}</b>${q ? '다른 이름으로 검색해 보세요.' : '오른쪽 아래 ‘물건 올리기’로 첫 물건을 올려 보세요.'}</div>`}
+    ${showAlertTip ? `<div class="notice-strip" style="margin:12px 16px 0">${I.bell.replace('<svg', '<svg width="18" height="18" style="flex:none"')}<span>알림을 켜면 새 물건이 올라올 때 바로 알려 드려요.</span><button data-act="bell">켜기</button></div>` : ''}
+    <section class="sec">
+      <div class="btabs" role="tablist">
+        <button class="${bt === 'new' ? 'on' : ''}" data-act="board:new">새 물건</button>
+        <button class="${bt === 'free' ? 'on' : ''}" data-act="board:free">나눔</button>
+        <button class="${bt === 'reserved' ? 'on' : ''}" data-act="board:reserved">예약중</button>
+      </div>
+      ${boardItems.length ? `<ul class="board">${boardItems.map(i => `<li data-act="open:${i.id}"><span class="t">${i.status === 'reserved' ? '<span class="pill reserved">예약중</span>' : Number(i.price) === 0 ? '<span class="pill free">나눔</span>' : ''}${esc(i.title)}${now() - i.createdAt < 864e5 ? '<span class="new">N</span>' : ''}</span><span class="d">${md(i.createdAt)}</span></li>`).join('')}</ul>`
+        : `<div class="board-empty">${bt === 'reserved' ? '예약중인 물건이 없어요.' : bt === 'free' ? '아직 나눔 물건이 없어요.' : '아직 올라온 물건이 없어요.'}</div>`}
+    </section>
+    <section class="sec" id="gal" style="scroll-margin-top:100px">
+      <div class="sec-head"><h2>${f === 'free' ? '나눔 갤러리' : '물건 갤러리'}</h2><button class="more" data-act="refresh" aria-label="새로고침">+</button></div>
+      <div class="gal-tools">
+        <label class="search">${I.search}<input id="q" type="search" placeholder="물건 이름으로 찾기" value="${esc(homeState.q)}" data-bind="search"></label>
+        <div class="chips" role="group" aria-label="카테고리">
+          <button class="chip ${homeState.cat === 'all' ? 'on' : ''}" data-act="cat:all">전체</button>
+          ${CATS.map(c => `<button class="chip ${homeState.cat === c ? 'on' : ''}" data-act="cat:${c}">${c}</button>`).join('')}
+        </div>
+        <div class="chips sub" role="group" aria-label="거래 상태">
+          <button class="chip ${f === 'selling' ? 'on' : ''}" data-act="filter:${f === 'selling' ? 'all' : 'selling'}">판매중만</button>
+          <button class="chip ${f === 'free' ? 'on' : ''}" data-act="filter:${f === 'free' ? 'all' : 'free'}">나눔만</button>
+        </div>
+      </div>
+      ${items.length ? `<ul class="gallery">${items.map(galCard).join('')}</ul>`
+        : `<div class="empty"><b>${q ? '찾는 물건이 없어요' : '아직 올라온 물건이 없어요'}</b>${q ? '다른 이름으로 검색해 보세요.' : '오른쪽 아래 ‘물건 올리기’로 첫 물건을 올려 보세요.'}</div>`}
+    </section>
+    <footer class="site-foot">
+      <div class="fl"><img src="logo.png" alt=""><b>동화<span>IN</span></b></div>
+      <nav><button data-act="suggestions">건의하기</button><button data-act="mapShow:">학교 지도</button><a href="https://donghwa.hs.kr/" target="_blank" rel="noopener">동화고 홈페이지</a></nav>
+      <p>동화IN은 동화고등학교 학생들이 학교 안에서 안전하게 물건을 사고팔고 나누도록 만든 학생 프로젝트예요.</p>
+      <p>가격 상한 30,000원 · 거래는 교내 직거래로만</p>
+      <p style="margin-top:8px">© 2026 Donghwa IN. All rights reserved.</p>
+    </footer>
     ${tabbar('home')}`;
   },
 
@@ -1421,6 +1551,8 @@ const ACT = {
   filter(f) { homeState.filter = f; render(); },
   cat(c) { homeState.cat = c; render(); },
   catGo(c) { homeState.cat = c; go('home'); },
+  board(t) { homeState.board = t; render(); },
+  galGo(f) { homeState.filter = f; if (f !== 'free') { homeState.cat = 'all'; } if (current().name !== 'home') go('home'); else render(); requestAnimationFrame(() => { const g = document.getElementById('gal'); g && g.scrollIntoView({ behavior: 'smooth' }); }); },
   pickCat(c, btn) {
     newFormState.cat = c;
     btn.parentElement.querySelectorAll('.chip').forEach(b => { const on = b === btn; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
