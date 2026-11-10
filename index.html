@@ -197,12 +197,25 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 .detail-meta { color: var(--fg-3); font-size: 13px; margin-top: 6px; }
 .desc { margin-top: 18px; white-space: pre-wrap; line-height: 1.75; word-break: break-word; }
 .facts { margin: 22px 0 8px; display: grid; gap: 10px; padding: 14px; border-radius: 14px; background: var(--surface-2); font-size: 14px; }
-.facts div { display: flex; gap: 10px; }
+.facts > div { display: flex; gap: 10px; }
+.facts .place-card { background: var(--surface); }
 .facts dt { color: var(--fg-3); width: 74px; flex: none; }
 .facts dd { margin: 0; font-weight: 500; min-width: 0; }
 .map-link { color: var(--brand); font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
 .map-box { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-2); }
 .map-box img { display: block; width: 100%; height: auto; }
+.map-spot { position: absolute; width: 34px; height: 34px; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid transparent; }
+.map-spot.on { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(29, 32, 137, .65), 0 0 18px rgba(226, 172, 63, .9); animation: ping 1.4s ease-in-out infinite; }
+@keyframes ping { 50% { transform: translate(-50%, -50%) scale(1.25); } }
+@media (prefers-reduced-motion: reduce) { .map-spot.on { animation: none; } }
+.place-card { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 14px; background: var(--brand-soft); }
+.place-card img { width: 96px; height: 72px; object-fit: cover; border-radius: 10px; flex: none; }
+.place-card b { display: block; font-size: 16px; }
+.place-card span { color: var(--fg-2); font-size: 13px; }
+.place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.place-tile { display: grid; gap: 4px; padding: 4px; border-radius: 12px; border: 2px solid transparent; font-size: 12.5px; font-weight: 600; text-align: center; }
+.place-tile img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 9px; background: var(--surface-2); }
+.place-tile.on { border-color: var(--brand); background: var(--brand-soft); }
 .map-pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11.5px; font-weight: 700; color: var(--brand); }
 .map-pin svg { width: 28px; height: 28px; fill: var(--surface); }
 .map-pin span { background: var(--surface); padding: 1px 6px; border-radius: 6px; box-shadow: var(--shadow); white-space: nowrap; }
@@ -211,6 +224,29 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 .place-btn { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); text-align: left; }
 .place-btn svg { width: 20px; height: 20px; color: var(--brand); flex: none; }
 .place-btn.on { border-color: var(--brand); background: var(--brand-soft); font-weight: 700; }
+.sug-list { padding: 4px 16px 24px; display: grid; gap: 10px; }
+.sug { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 6px; }
+.sug-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; text-align: left; }
+.sug-st { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--surface-2); color: var(--fg-2); }
+.sug-st.st1 { background: var(--gold-soft); color: var(--gold-ink); }
+.sug-st.st2 { background: var(--brand-soft); color: var(--brand); }
+.sug-st.st3 { background: var(--ok-soft); color: var(--ok); }
+.sug-kind { font-weight: 700; font-size: 14px; }
+.sug-meta { color: var(--fg-3); font-size: 12px; margin-left: auto; }
+.sug-text { margin: 0; white-space: pre-wrap; word-break: break-word; }
+.sug:not(.open) .sug-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sug:not(.open) .sug-reply, .sug:not(.open) .sug-wait { display: none; }
+.sug-reply { background: var(--brand-soft); border-radius: 10px; padding: 8px 12px; font-size: 14px; }
+.sug-reply b { color: var(--brand); }
+.sug-reply span { color: var(--fg-3); font-size: 12px; }
+.sug-reply p { margin: 4px 0 0; white-space: pre-wrap; }
+.sug-wait { color: var(--fg-3); font-size: 13px; }
+.sug-admin { display: grid; gap: 8px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.sug-reply-box { display: flex; gap: 6px; }
+.sug-reply-box .input { padding: 8px 12px; flex: 1; min-width: 0; }
+.sug-reply-box .btn { white-space: nowrap; flex: none; }
+.sug-admin .chips { flex-wrap: wrap; }
+.admin-entry { text-align: center; padding: 8px 0 24px; }
 .report-reasons { display: grid; gap: 6px; }
 .banner { margin: 16px 16px 0; padding: 12px 14px; border-radius: 12px; font-size: 13.5px; line-height: 1.55; }
 .banner.reserved { background: var(--ok-soft); color: var(--ok); }
@@ -416,15 +452,24 @@ function josa(word, withB, withoutB) {
 const gradeOf = sid => /^\d{4,6}$/.test(sid || '') ? sid[0] + '학년' : '';
 const MAX_PRICE = 30000;          /* 학생끼리 거래 — 가격 상한 */
 const MAX_DEAL_DAYS = 30;         /* 거래 약속은 오늘부터 30일 안 */
-/* 직거래 장소. 학교 배치도(school-map.png)를 넣으면 x, y(%) 위치에 핀이 찍혀요. */
-const SCHOOL_MAP = 'school-map.png';
+/* 직거래 장소 — 학교 건물 배치도(school-map.jpg) 위 위치(x, y %)와 사진.
+   사진은 학교 홈페이지(donghwa.hs.kr) 사진을 먼저 쓰고, 안 열리면 배치도에서 잘라 둔 사진(places/)을 씀 */
+const SCHOOL_MAP = 'school-map.jpg';
+const SCHOOL_SITE = 'https://www.donghwa.hs.kr/images/';
 const PLACES = [
-  { name: '정문', x: null, y: null },
-  { name: '도서관', x: null, y: null },
-  { name: '매점 앞', x: null, y: null },
-  { name: '급식실 앞', x: null, y: null },
-  { name: '교무실 앞', x: null, y: null }
+  { name: '비전관', mark: '①', x: 5.8, y: 55.6, desc: '1학년 교실 · 도서관(글빛나래) · 보건실', img: 'local_001.png', alt: 'vision' },
+  { name: '창의관', mark: '②', x: 10.6, y: 43.0, desc: '과학실 · 미술실 · 교무실', img: 'local_003.png', alt: 'changui' },
+  { name: '두나미스관', mark: '③', x: 27.5, y: 41.8, desc: '2학년 교실 · 컴퓨터실 · 학생회실', img: 'local_002.png', alt: 'dunamis' },
+  { name: '송학관', mark: '④', x: 56.8, y: 47.8, desc: '3학년 교실 · 진학상담실 · 중앙정원', img: 'local_004.png', alt: 'songhak' },
+  { name: '어울림동', mark: 'Ⓑ', x: 47.2, y: 72.9, desc: '식당 · 매점 · 농구장', img: 'local_008.png', alt: 'eoullim' },
+  { name: '화록동산', mark: 'Ⓐ', x: 10.6, y: 77.7, desc: '벤치가 있는 쉼터', img: 'local_005.png', alt: 'hwarok' },
+  { name: '여호수아홀', mark: 'Ⓒ', x: 79.8, y: 77.5, desc: '다목적 강당', img: 'local_006.png', alt: 'joshua' },
+  { name: '소망관', mark: '⑦', x: 15.7, y: 89.7, desc: '음악실 · 오케스트라 연습실', img: 'local_009.png', alt: 'somang' },
+  { name: '믿음관', mark: '⑤', x: 76.5, y: 48.0, desc: '중학교 건물', img: 'local_011.png', alt: 'mideum' },
+  { name: '사랑관', mark: '⑥', x: 71.4, y: 89.9, desc: '중학교 건물', img: 'local_010.png', alt: 'sarang' }
 ];
+const placeImg = p => `<img src="${SCHOOL_SITE}${p.img}" alt="" loading="lazy" onerror="this.onerror=null;this.src='places/${p.alt}.jpg'">`;
+const findPlace = name => PLACES.find(p => p.name === name || (name || '').startsWith(p.name));
 const CATS = ['교재·문제집', '도서', '필기구·학용품', '전자기기', '의류·체육복', '생활용품', '스포츠·취미', '기타'];
 const AV_COLORS = ['#1d2089', '#3b4bc8', '#b0812a', '#2f6f8f', '#6b3fa0', '#8a3b52', '#2d7a5a'];
 function hashN(s, n) { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h % n; }
@@ -534,7 +579,7 @@ async function firebaseStore(cfg) {
    상태
    ===================================================================== */
 let store;
-const S = { items: [], rooms: [], reviews: [], deals: [], reports: [], loaded: { items: false, rooms: false, reviews: false, deals: false } };
+const S = { items: [], rooms: [], reviews: [], deals: [], reports: [], suggestions: [], loaded: { items: false, rooms: false, reviews: false, deals: false } };
 const DEMO_USERS = [
   { uid: 'demo_kim', sid: '20107', name: '김서연' },
   { uid: 'demo_park', sid: '30412', name: '박준호' },
@@ -657,13 +702,15 @@ function back() {
   if (stack.length > 1) stack.pop(); else stack.splice(0, stack.length, { name: 'home', params: {} });
   render(true); window.scrollTo(0, current().y || 0);
 }
-const LIVE = new Set(['home', 'chats', 'me', 'detail']);
+const LIVE = new Set(['home', 'chats', 'me', 'detail', 'suggestions']);
 function render(fresh = false) {
   const v = current();
   const view = $('#view');
   if (!fresh && !LIVE.has(v.name)) { if (v.name === 'chat') updateChat(); return; }
   const y = fresh ? 0 : window.scrollY;
   const focusQ = document.activeElement && document.activeElement.id === 'q' ? document.activeElement.selectionStart : null;
+  const keep = {}; view.querySelectorAll('input[id^="rep-"]').forEach(x => { if (x.value) keep[x.id] = x.value; });
+  const focusId = document.activeElement && document.activeElement.id && document.activeElement.id.startsWith('rep-') ? document.activeElement.id : null;
   cleanupChat();
   const app = $('#app');
   app.classList.toggle('no-tabs', !TABS.includes(v.name));
@@ -671,6 +718,8 @@ function render(fresh = false) {
   view.innerHTML = VIEWS[v.name](v.params);
   view.querySelectorAll('[data-bind]').forEach(el => el.dataset.bind.split(' ').forEach(fn => BIND[fn] && BIND[fn](el, v.params)));
   if (v.name === 'chat') mountChat(v.params);
+  Object.entries(keep).forEach(([k, v]) => { const x = document.getElementById(k); if (x) x.value = v; });
+  if (focusId && document.getElementById(focusId)) document.getElementById(focusId).focus();
   if (focusQ != null && $('#q')) { $('#q').focus(); $('#q').setSelectionRange(focusQ, focusQ); }
   window.scrollTo(0, y);
 }
@@ -803,6 +852,7 @@ const VIEWS = {
       <div class="desc">${esc(i.desc)}</div>
       <dl class="facts">
         <div><dt>직거래 장소</dt><dd>${esc(i.place || '채팅으로 정해요')} ${i.place ? `<button class="map-link" data-act="mapShow:${esc(i.place)}">지도 보기</button>` : ''}</dd></div>
+        ${findPlace(i.place) ? `<div class="place-card" data-act="mapShow:${esc(i.place)}" style="cursor:pointer">${placeImg(findPlace(i.place))}<div><b>${findPlace(i.place).mark} ${esc(findPlace(i.place).name)}</b><span>${esc(findPlace(i.place).desc)}</span></div></div>` : ''}
         <div><dt>거래 방식</dt><dd>${Number(i.price) === 0 ? '무료 나눔' : '직거래 · 현장 결제'}</dd></div>
       </dl>
     </div>
@@ -856,9 +906,8 @@ const VIEWS = {
       </div>
       <div class="field">
         <label for="f-place">직거래 장소</label>
-        <input class="input" id="f-place" maxlength="40" placeholder="예) 본관 1층 매점 앞">
-        <div class="chips">${PLACES.map(p => `<button type="button" class="chip" data-act="place:${p.name}">${p.name}</button>`).join('')}</div>
-        <button type="button" class="btn ghost sm" style="justify-self:start" data-act="mapPick">${I.pin.replace('<svg', '<svg width="16" height="16"')}학교 지도에서 고르기</button>
+        <input class="input" id="f-place" maxlength="40" placeholder="지도에서 고르거나 직접 입력 (예: 어울림동 매점 앞)">
+        <button type="button" class="btn primary sm" style="justify-self:start" data-act="mapPick">${I.pin.replace('<svg', '<svg width="16" height="16"')}학교 지도에서 고르기</button>
       </div>
       <p class="err" id="formErr" role="alert" hidden></p>
     </form>
@@ -950,7 +999,7 @@ const VIEWS = {
       <div><b>새 물건 알림</b><small>${p.newItemAlert ? (perm === 'granted' ? '휴대폰·PC 알림과 화면 알림으로 받아요' : '화면 안 알림으로 받아요 (브라우저 알림은 허용되지 않음)') : '새 물건이 올라오면 ‘<제목>이 등록되었어요’ 알림'}</small></div>
       <button class="switch ${p.newItemAlert ? 'on' : ''}" role="switch" aria-checked="${p.newItemAlert}" aria-label="새 물건 알림" data-act="bell"></button>
     </div>
-    <div class="setting"><div><b>관리자에게 건의하기</b><small>불편한 점이나 필요한 기능을 알려 주세요</small></div><button class="btn ghost sm" data-act="suggest">${I.mail.replace('<svg', '<svg width="16" height="16"')}건의</button></div>
+    <div class="setting"><div><b>관리자에게 건의하기</b><small>건의를 보내고, 진행 상황과 관리자 답글을 확인해요</small></div><button class="btn ghost sm" data-act="suggestions">${I.mail.replace('<svg', '<svg width="16" height="16"')}건의 기록${S.suggestions.some(x => x.fromUid === me.uid && (x.replies || []).length) ? ' <span class="unread"></span>' : ''}</button></div>
     <div class="setting"><div><b>거래 약속 알림</b><small>채팅방에서 정한 약속 시간 10분 전에 알려 드려요 (항상 켜짐)</small></div></div>
     <div class="seg">
       <button class="chip ${tab === 'sell' ? 'on' : ''}" data-act="meTab:sell">판매 내역 ${mineItems.length}</button>
@@ -970,6 +1019,34 @@ const VIEWS = {
   }
 };
 const meState = { tab: 'sell' };
+VIEWS.suggestions = () => {
+  const admin = isAdmin();
+  const tab = admin ? (sugState.tab === 'reports' ? 'reports' : 'all') : sugState.tab;
+  const all = [...S.suggestions].sort((a, b) => b.at - a.at);
+  const mine = all.filter(x => x.fromUid === me.uid);
+  const list = tab === 'mine' ? mine : all;
+  let body;
+  if (tab === 'reports') {
+    const groups = {};
+    S.reports.forEach(r => { (groups[r.itemId] = groups[r.itemId] || []).push(r); });
+    const ids = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
+    body = ids.length ? ids.map(id => { const it = itemById(id); const rs = groups[id];
+      return `<article class="sug open"><div class="sug-head"><span class="sug-st st0">신고 ${rs.length}건</span><span class="sug-kind">${esc(rs[0].itemTitle)}</span></div>
+        ${rs.map(r => `<div class="sug-reply"><b>${esc(r.reason)}</b> <span>${esc(r.reporterName || '')} ${esc(r.reporterSid || '')} · ${ago(r.at)}</span>${r.detail ? `<p>${esc(r.detail)}</p>` : ''}<button class="map-link" data-act="reportDismiss:${r.id}">처리 완료</button></div>`).join('')}
+        <div class="btns" style="display:flex;gap:6px;margin-top:8px">${it ? `<button class="btn soft sm" data-act="open:${id}">글 보기</button><button class="btn ghost sm" style="color:var(--danger)" data-act="adminDeleteItem:${id}">글 삭제</button>` : '<span class="sug-wait">이미 지워진 글이에요.</span>'}</div></article>`; }).join('')
+      : '<div class="empty">들어온 신고가 없어요.</div>';
+  } else body = list.length ? list.map(x => sugCard(x, admin)).join('') : `<div class="empty"><b>${tab === 'mine' ? '보낸 건의가 없어요' : '아직 건의가 없어요'}</b>불편한 점이나 필요한 기능을 알려 주세요.</div>`;
+  return `<header class="topbar title-bar"><button class="icon-btn" data-act="back" aria-label="뒤로">${I.back}</button><h1>${admin ? '관리자 · 건의와 신고' : '건의 기록'}</h1>
+      ${admin ? '<button class="btn ghost sm" data-act="adminLogout">관리자 끄기</button>' : ''}</header>
+    <div class="home-tools">
+      <button class="btn primary block" data-act="suggest">${I.mail.replace('<svg', '<svg width="18" height="18"')}새 건의 쓰기</button>
+      <div class="chips">${admin
+        ? `<button class="chip ${tab === 'all' ? 'on' : ''}" data-act="sugTab:all">건의 ${all.length}</button><button class="chip ${tab === 'reports' ? 'on' : ''}" data-act="sugTab:reports">신고 ${new Set(S.reports.map(r => r.itemId)).size}</button>`
+        : `<button class="chip ${tab === 'mine' ? 'on' : ''}" data-act="sugTab:mine">내 건의 ${mine.length}</button><button class="chip ${tab === 'all' ? 'on' : ''}" data-act="sugTab:all">전체 건의 ${all.length}</button>`}</div>
+    </div>
+    <div class="sug-list">${body}</div>
+    ${admin ? '' : '<div class="admin-entry"><button class="map-link" data-act="adminLogin">관리자 로그인</button></div>'}`;
+};
 
 /* 화면에 붙는 동작 */
 const BIND = {
@@ -1134,18 +1211,26 @@ async function ensureRoom(item, buyer) {
 
 /* ---------------- 학교 지도 ---------------- */
 function mapSheet({ pick = false, highlight = '' } = {}) {
-  const pinned = PLACES.filter(p => p.x != null && p.y != null);
+  let sel = findPlace(highlight) || null;
+  const card = p => p ? `<div class="place-card">${placeImg(p)}<div><b>${p.mark} ${esc(p.name)}</b><span>${esc(p.desc)}</span></div></div>` : '';
   sheet(`<h3>${pick ? '직거래 장소 고르기' : '직거래 장소'}</h3>
-    <div class="map-box" id="mapBox" ${pinned.length ? '' : 'hidden'}>
-      <img src="${SCHOOL_MAP}" alt="동화고 교내 배치도" id="mapImg">
-      ${pinned.map(p => `<button class="map-pin ${p.name === highlight ? 'on' : ''}" style="left:${p.x}%;top:${p.y}%" ${pick ? `data-pick="${esc(p.name)}"` : ''}>${I.pin}<span>${esc(p.name)}</span></button>`).join('')}
-    </div>
-    <div class="place-list">${PLACES.map(p => `<button class="place-btn ${p.name === highlight ? 'on' : ''}" ${pick ? `data-pick="${esc(p.name)}"` : ''}>${I.pin}${esc(p.name)}</button>`).join('')}</div>
-    ${highlight && !PLACES.some(p => p.name === highlight) ? `<p>판매자가 직접 적은 장소예요: <b>${esc(highlight)}</b></p>` : ''}
-    <div class="btns"><button class="btn soft" data-close>닫기</button></div>`,
+    ${pick ? '<p>지도의 번호나 아래 건물을 눌러 고르세요.</p>' : ''}
+    <div class="map-box"><img src="${SCHOOL_MAP}" alt="동화중·고등학교 건물 배치도 항공사진">
+      ${PLACES.map(p => `<button class="map-spot ${sel === p ? 'on' : ''}" style="left:${p.x}%;top:${p.y}%" data-spot="${esc(p.name)}" aria-label="${esc(p.name)}"></button>`).join('')}</div>
+    <div id="placeCard">${card(sel)}</div>
+    ${highlight && !sel ? `<p>판매자가 직접 적은 장소예요: <b>${esc(highlight)}</b></p>` : ''}
+    <div class="place-grid">${PLACES.map(p => `<button class="place-tile ${sel === p ? 'on' : ''}" data-spot="${esc(p.name)}">${placeImg(p)}<span>${p.mark} ${esc(p.name)}</span></button>`).join('')}</div>
+    <div class="btns"><button class="btn soft" data-close>닫기</button>${pick ? '<button class="btn primary" id="placeOk" disabled>이 장소로 정하기</button>' : ''}</div>`,
     (el, close) => {
-      const img = $('#mapImg', el); if (img) img.onerror = () => { $('#mapBox', el).hidden = true; };
-      el.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => { $('#f-place').value = b.dataset.pick; close(); });
+      const choose = name => {
+        sel = findPlace(name);
+        el.querySelectorAll('[data-spot]').forEach(b => b.classList.toggle('on', b.dataset.spot === name));
+        $('#placeCard', el).innerHTML = card(sel);
+        const ok = $('#placeOk', el); if (ok) ok.disabled = false;
+      };
+      el.querySelectorAll('[data-spot]').forEach(b => b.onclick = () => choose(b.dataset.spot));
+      const ok = $('#placeOk', el);
+      if (ok) { ok.disabled = !sel; ok.onclick = () => { const cur = $('#f-place').value.trim(); if (!findPlace(cur)) $('#f-place').value = sel.name; else $('#f-place').value = sel.name; close(); }; }
     });
 }
 
@@ -1182,10 +1267,63 @@ function suggestSheet() {
       $('#sg-ok', el).onclick = async () => {
         const text = $('#sg-text', el).value.trim();
         if (text.length < 5) { const e = $('#sg-err', el); e.textContent = '5자 이상 써 주세요.'; e.hidden = false; return; }
-        await store.add('suggestions', { kind, text, fromUid: me.uid, fromName: me.name || '', fromSid: me.sid || '', at: now() });
-        close(); toast('건의를 보냈어요', '소중한 의견 고마워요!');
+        await store.add('suggestions', { kind, text, fromUid: me.uid, fromName: me.name || '', fromSid: me.sid || '', at: now(), status: '접수됨', replies: [] });
+        close(); toast('건의를 보냈어요', '건의 기록에서 진행 상황을 볼 수 있어요.'); sugState.tab = 'mine'; if (current().name !== 'suggestions') go('suggestions'); else render();
       };
     });
+}
+
+/* ---------------- 건의 기록 · 관리자 ---------------- */
+const SUG_STATUS = ['접수됨', '검토 중', '답변 완료', '반영 완료'];
+const sugState = { tab: 'mine', open: '' };
+/* 관리자 비밀번호는 해시로만 저장 (코드에 비밀번호 원문이 없음) */
+const ADMIN_HASH = '562e8869e613fe8c5fa1a9b3a9f8ceac8e65c2e24c2be49231a9382ac074ec3e';
+const isAdmin = () => ss.get('dh_admin', false) === true;
+async function sha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+function adminSheet() {
+  sheet(`<h3>관리자 로그인</h3><p>관리자 비밀번호를 입력하면 건의에 답글을 달고, 신고된 글을 처리할 수 있어요.</p>
+    <input class="input" id="ad-pw" type="password" autocomplete="off" placeholder="관리자 비밀번호">
+    <p class="err" id="ad-err" hidden></p>
+    <div class="btns"><button class="btn soft" data-close>취소</button><button class="btn primary" id="ad-ok">확인</button></div>`,
+    (el, close) => {
+      const go2 = async () => {
+        const pw = $('#ad-pw', el).value.trim().toUpperCase();
+        let ok = false; try { ok = (await sha256('dongwha-in:' + pw)) === ADMIN_HASH; } catch {}
+        if (!ok) { const e = $('#ad-err', el); e.textContent = '비밀번호가 맞지 않아요.'; e.hidden = false; return; }
+        ss.set('dh_admin', true); close(); toast('관리자 모드를 켰어요'); render();
+      };
+      $('#ad-ok', el).onclick = go2; $('#ad-pw', el).addEventListener('keydown', e => { if (e.key === 'Enter') go2(); }); $('#ad-pw', el).focus();
+    });
+}
+let prevSug = null;
+function onSuggestionsChanged(list) {
+  if (prevSug) list.forEach(sg => {
+    if (sg.fromUid !== me.uid) return;
+    const old = prevSug.get(sg.id);
+    if (old && (sg.replies || []).length > (old.replies || []).length) notify('건의에 답글이 달렸어요', (sg.replies.at(-1) || {}).text || '', () => { sugState.tab = 'mine'; sugState.open = sg.id; go('suggestions'); });
+    else if (old && old.status !== sg.status) notify('건의 진행 상황이 바뀌었어요', `‘${sg.text.slice(0, 20)}…’ → ${sg.status}`, () => { sugState.tab = 'mine'; go('suggestions'); });
+  });
+  prevSug = new Map(list.map(x => [x.id, JSON.parse(JSON.stringify(x))]));
+}
+function sugCard(sg, admin) {
+  const mine = sg.fromUid === me.uid;
+  const st = sg.status || '접수됨';
+  const open = sugState.open === sg.id || admin;
+  const who = admin ? `${esc(sg.fromName || '이름 없음')} · ${esc(sg.fromSid || '')}` : (mine ? '내 건의' : '익명 학생');
+  return `<article class="sug ${open ? 'open' : ''}">
+    <button class="sug-head" data-act="sugOpen:${sg.id}">
+      <span class="sug-st st${SUG_STATUS.indexOf(st)}">${esc(st)}</span>
+      <span class="sug-kind">${esc(sg.kind || '건의')}</span>
+      <span class="sug-meta">${who} · ${ago(sg.at)}</span>
+    </button>
+    <p class="sug-text">${esc(sg.text)}</p>
+    ${(sg.replies || []).map(r => `<div class="sug-reply"><b>${esc(r.by || '관리자')}</b> <span>${ago(r.at)}</span><p>${esc(r.text)}</p></div>`).join('')}
+    ${!admin && !(sg.replies || []).length ? '<div class="sug-wait">관리자가 아직 답하지 않았어요.</div>' : ''}
+    ${admin ? `<div class="sug-admin">
+      <div class="chips">${SUG_STATUS.map((x, k) => `<button class="chip ${x === st ? 'on' : ''}" data-act="sugStatus:${sg.id}|${k}">${x}</button>`).join('')}</div>
+      <div class="sug-reply-box"><input class="input" id="rep-${sg.id}" maxlength="500" placeholder="답글 쓰기"><button class="btn primary sm" data-act="sugReply:${sg.id}">답글</button></div>
+    </div>` : ''}
+  </article>`;
 }
 
 /* ---------------- 프로필 시트 ---------------- */
@@ -1311,6 +1449,26 @@ const ACT = {
     reportSheet(i);
   },
   suggest() { suggestSheet(); },
+  suggestions() { go('suggestions'); },
+  sugTab(t) { sugState.tab = t; render(); },
+  sugOpen(id) { sugState.open = sugState.open === id ? '' : id; render(); },
+  adminLogin() { adminSheet(); },
+  adminLogout() { ss.set('dh_admin', false); toast('관리자 모드를 껐어요'); render(); },
+  async sugStatus(arg) { const [id, k] = arg.split('|'); if (!isAdmin()) return; await store.set('suggestions', id, { status: SUG_STATUS[Number(k)] }); },
+  async sugReply(id) {
+    if (!isAdmin()) return;
+    const inp = $('#rep-' + id); const text = inp.value.trim(); if (!text) return; inp.value = '';
+    const sg = S.suggestions.find(x => x.id === id);
+    const replies = [...(sg.replies || []), { text, at: now(), by: '관리자' }];
+    await store.set('suggestions', id, { replies, status: sg.status === '접수됨' ? '답변 완료' : sg.status, repliedAt: now() });
+    toast('답글을 달았어요');
+  },
+  async reportDismiss(rid) { if (!isAdmin()) return; await store.del('reports', rid); toast('신고를 처리 완료로 지웠어요'); },
+  async adminDeleteItem(id) {
+    if (!isAdmin()) return;
+    if (!await confirmSheet('이 글을 삭제할까요?', '신고된 글을 관리자 권한으로 지워요. 되돌릴 수 없어요.', '삭제', true)) return;
+    await store.del('items', id); await store.del('photos', id); S.reports.filter(r => r.itemId === id).forEach(r => store.del('reports', r.id)); toast('글을 삭제했어요');
+  },
   async submitItem(_, btn) {
     const v = id => $(id).value.trim();
     const title = v('#f-title'), desc = v('#f-desc'), sid = v('#f-sid'), name = v('#f-name'), place = v('#f-place');
@@ -1461,6 +1619,7 @@ async function boot() {
     const done = k => { S.loaded[k] = true; if (k === 'items') itemsDone(); if (Object.values(S.loaded).every(Boolean)) res(); };
     store.watch('items', l => { S.items = l; onItemsChanged(l); done('items'); render(); });
     store.watch('reports', l => { S.reports = l; render(); });
+    store.watch('suggestions', l => { onSuggestionsChanged(l); S.suggestions = l; render(); });
     store.watch('rooms', l => { S.rooms = l; onRoomsChanged(l); done('rooms'); render(); checkDealReminders(); });
     store.watch('reviews', l => { S.reviews = l; done('reviews'); render(); });
     store.watch('deals', l => { S.deals = l; done('deals'); render(); });
